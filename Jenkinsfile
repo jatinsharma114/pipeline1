@@ -34,7 +34,7 @@ pipeline {
 
         stage('Email notification Sending') {
             steps {
-                emailext body: 'Hey Jatin Jenkins Pipeline Build Success Jatin!!', subject: 'Jenkins Pipeline Build Success Jatin!!', to: 'jatin2010sharma@gmail.com'
+                mail bcc: '', body: 'From SMTP bhai', cc: '', from: '', replyTo: '', subject: 'MAIL', to: 'jatin2010sharma@gmail.com'            
             }
         }
     }
