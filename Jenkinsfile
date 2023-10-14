@@ -5,7 +5,7 @@ pipeline {
         stage('Build') {
             steps {
                 // Get some code from a GitHub repository
-                git url: 'https://github.com/jatinsharma114/freshjuic.git', branch: 'main'
+                git url: 'https://github.com/jatinsharma114/pipeline1.git', branch: 'main'
             }
         }
 
