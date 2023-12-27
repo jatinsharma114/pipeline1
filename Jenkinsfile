@@ -45,6 +45,10 @@
 pipeline {
     agent any
 
+    environment {
+        IMAGE_TAG = "${BUILD_NUMBER}"
+    }
+
     stages {
         stage('Build') {
             steps {
@@ -61,6 +65,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
+                echo 'Buid Docker Image'
                 sh "docker build -t pipelineimg ."
             }
         }
