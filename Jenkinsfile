@@ -69,8 +69,8 @@ pipeline {
             steps{
                 withCredentials([usernamePassword(credentialsId:"dockerhub",passwordVariable:"dockerHubPass",usernameVariable:"dockerHubUser")]){
                     sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
-                    sh "docker tag pipelineimg ${env.dockerHubUser}/pipelineimg:latest"
-                    sh "docker push ${env.dockerHubUser}/pipelineimg:latest"
+                    sh "docker tag pipelineimg ${env.dockerHubUser}/pipelineimg:${BUILD_NUMBER}"
+                    sh "docker push ${env.dockerHubUser}/pipelineimg:${BUILD_NUMBER}"
                 }
             }
         }
