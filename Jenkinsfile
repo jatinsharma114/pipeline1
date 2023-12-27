@@ -75,11 +75,11 @@ pipeline {
             }
         }
 
-        stage('Email notification Sending') {
-            steps {
-                mail bcc: '', body: 'From SMTP bhai', cc: '', from: '', replyTo: '', subject: 'MAIL', to: 'jatin2010sharma@gmail.com'            
-            }
-        }
+        // stage('Email notification Sending') {
+        //     steps {
+        //         mail bcc: '', body: 'From SMTP bhai', cc: '', from: '', replyTo: '', subject: 'MAIL', to: 'jatin2010sharma@gmail.com'            
+        //     }
+        // }
     }
 }
 
