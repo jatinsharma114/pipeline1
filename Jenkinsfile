@@ -64,9 +64,10 @@ pipeline {
                 sh "docker build -t pipelineimg ."
             }
         }
-
+        //${BUILD_NUMBER} is a env variable is jenkins 
         stage("Push to DockerHub"){
             steps{
+                echo "The build number is ${env.BUILD_NUMBER}"
                 withCredentials([usernamePassword(credentialsId:"dockerhub",passwordVariable:"dockerHubPass",usernameVariable:"dockerHubUser")]){
                     sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
                     sh "docker tag pipelineimg ${env.dockerHubUser}/pipelineimg:${BUILD_NUMBER}"
