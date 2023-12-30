@@ -88,6 +88,35 @@ pipeline {
         //         mail bcc: '', body: 'From SMTP bhai', cc: '', from: '', replyTo: '', subject: 'MAIL', to: 'jatin2010sharma@gmail.com'            
         //     }
         // }
+
+        stage('Update Deployment File') {
+            environment {
+                GIT_REPO_NAME = "pipeline1"
+                GIT_USER_NAME = "jatinsharma114"
+            }
+        steps {
+            withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
+                sh '''
+				    echo "GitHub to push the deployment.yml file for ArgoCD Deployment in EKS cluster :::::::::::::::::::::::::::::::::::::::: "
+					
+                    git config user.email "jatin2010sharma@gmail.com"
+                    git config user.name "Jatin Sharma"
+                    BUILD_NUMBER=${BUILD_NUMBER}
+					
+					//Give the path where the deployment.yml file is located. 
+                    sed -i "s/pipelineimg/${BUILD_NUMBER}/g" deployment.yml
+					
+					echo "Adding deployment file on the staging area! :::::::::::::::::::::::::::::::::::::::: "
+                    git add deployment.yml
+					
+                    git commit -m "Update deployment image to version ${BUILD_NUMBER}"
+					
+					//make sure Barnch is main or master 
+                    git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+                '''
+                }
+            }
+        }
     }
 }
 
