@@ -60,8 +60,7 @@ pipeline {
                     git config user.email "jatin2010sharma@gmail.com"
                     git config user.name "Jatin Sharma"
                     BUILD_NUMBER=${BUILD_NUMBER}
-
-	            cat deployment.yml
+		    
 		    //Give the path where the deployment.yml file is located. 
                     //Here We would search with the keyword APP_NAME: that anything ( .* ) matches with this, instead of v1 we replace with the Jenkins BUILD VERSION with image_name.
                     //It should be done in deployment.yml
