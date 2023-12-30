@@ -72,20 +72,22 @@ pipeline {
         //${BUILD_NUMBER} is a env variable is jenkins 
         stage("Push to DockerHub"){
             steps{
-                echo "The build number is ${env.BUILD_NUMBER}"
+                echo "The build number is : ${env.BUILD_NUMBER}"
                 withCredentials([usernamePassword(credentialsId:"dockerhub",passwordVariable:"dockerHubPass",usernameVariable:"dockerHubUser")]){
                     sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
+                    echo "Login to Dockerhub :::::::::::::::::::::::: "
                     sh "docker tag pipelineimg ${env.dockerHubUser}/pipelineimg:${BUILD_NUMBER}"
+                    echo "Now pushing the image to Dockerhub :::::::::::::::::::::::: "
                     sh "docker push ${env.dockerHubUser}/pipelineimg:${BUILD_NUMBER}"
                 }
             }
         }
 
-        stage('Email notification Sending') {
-            steps {
-                mail bcc: '', body: 'From SMTP bhai', cc: '', from: '', replyTo: '', subject: 'MAIL', to: 'jatin2010sharma@gmail.com'            
-            }
-        }
+        // stage('Email notification Sending') {
+        //     steps {
+        //         mail bcc: '', body: 'From SMTP bhai', cc: '', from: '', replyTo: '', subject: 'MAIL', to: 'jatin2010sharma@gmail.com'            
+        //     }
+        // }
     }
 }
 
