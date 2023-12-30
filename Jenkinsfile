@@ -53,7 +53,7 @@ pipeline {
 		IMAGE_TAG = "${BUILD_NUMBER}"
             }
         steps {
-            withCredentials([string(credentialsId: 'GitHub', variable: 'GITHUB_TOKEN')]) {
+            withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
                 sh '''
 		    echo "GitHub to push the deployment.yml file for ArgoCD Deployment in EKS cluster :::::::::::::::::::::::::::::::::::::::: "
 					
