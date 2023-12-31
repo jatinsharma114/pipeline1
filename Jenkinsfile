@@ -6,38 +6,41 @@ pipeline {
     }
 
     stages {
-        stage('Build') {
+        stage('GitHub Main Branch checkout') {
             steps {
                 // Get some code from a GitHub repository
                 git url: 'https://github.com/jatinsharma114/pipeline1.git', branch: 'main'
             }
         }
 
-        // stage('Maven Clean Install') {
-        //     steps {
-        //         sh "mvn clean install"
-        //     }
-        // }
+        stage('Maven Clean Install') {
+            steps {
+                echo 'Maven Clean Install::::::::::::::::::::::::'
+                sh "mvn clean install"
+                echo 'Maven Clean Install Done::::::::::::::::::::::::'
+            }
+        }
 
-        // stage('Build Docker Image') {
-        //     steps {
-        //         echo 'Buid Docker Image'
-        //         sh "docker build -t pipelineimg ."
-        //     }
-        // }
-        // //${BUILD_NUMBER} is a env variable is jenkins 
-        // stage("Push to DockerHub"){
-        //     steps{
-        //         echo "The build number is : ${env.BUILD_NUMBER}"
-        //         withCredentials([usernamePassword(credentialsId:"dockerhub",passwordVariable:"dockerHubPass",usernameVariable:"dockerHubUser")]){
-        //             sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
-        //             echo "Login to Dockerhub :::::::::::::::::::::::: "
-        //             sh "docker tag pipelineimg ${env.dockerHubUser}/pipelineimg:${BUILD_NUMBER}"
-        //             echo "Now pushing the image to Dockerhub :::::::::::::::::::::::: "
-        //             sh "docker push ${env.dockerHubUser}/pipelineimg:${BUILD_NUMBER}"
-        //         }
-        //     }
-        // }
+        stage('Build Docker Image') {
+            steps {
+                echo 'Build Docker Image::::::::::::::::::::::::'
+                sh "docker build -t pipelineimg ."
+            }
+        }
+        
+        //{BUILD_NUMBER} is an env variable is Jenkins 
+        stage("Push to DockerHub"){
+            steps{
+                echo "The build number is : ${env.BUILD_NUMBER}"
+                withCredentials([usernamePassword(credentialsId:"dockerhub",passwordVariable:"dockerHubPass",usernameVariable:"dockerHubUser")]){
+                    sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
+                    echo "Login to Dockerhub :::::::::::::::::::::::: "
+                    sh "docker tag pipelineimg ${env.dockerHubUser}/pipelineimg:${BUILD_NUMBER}"
+                    echo "Now pushing the image to Dockerhub :::::::::::::::::::::::: "
+                    sh "docker push ${env.dockerHubUser}/pipelineimg:${BUILD_NUMBER}"
+                }
+            }
+        }
 
         // stage('Email notification Sending') {
         //     steps {
@@ -45,7 +48,7 @@ pipeline {
         //     }
         // }
 
-        stage('Update Deployment File') {
+        stage('Update Deployment File For ArgoCD CD for K8C') {
         environment {
         GIT_REPO_NAME = "pipeline1"
         GIT_USER_NAME = "jatinsharma114"
@@ -58,7 +61,7 @@ pipeline {
                 echo "Entered to the GitHub"
 
                 sh '''
-                    echo "GitHub: Pushing deployment.yml for ArgoCD Deployment in EKS cluster"
+                    echo "GitHub: Pushing deployment.yml for ArgoCD Deployment in EKS cluster::::::::::::::::::::::::"
                     git config user.email "jatin2010sharma@gmail.com"
                     git config user.name "Jatin Sharma"
                     BUILD_NUMBER=${BUILD_NUMBER}
@@ -67,25 +70,19 @@ pipeline {
                     set -e
                     
                     # Display contents of deployment.yml before modification
-                    echo "Contents of deployment.yml BEFORE:"
+                    echo "Contents of deployment.yml BEFORE::::::::::::::::::::::::: "
                     cat deployment.yml
                     
                     # Update image tag in deployment.yml based on BUILD_NUMBER
                     sed -i "s#image: ${APP_NAME}:.*#image: ${APP_NAME}:${IMAGE_TAG}#g" deployment.yml
                     
                     # Display contents of deployment.yml after modification
-                    echo "Contents of deployment.yml AFTER:"
+                    echo "Contents of deployment.yml AFTER::::::::::::::::::::::::: "
                     cat deployment.yml
                     
                     # Add and commit changes to GitHub repository
                     git add deployment.yml
                     git commit -m "Update deployment image to version ${BUILD_NUMBER}"
-                    
-                    # Push changes to the repository using Git credentials
-                    #git push https://${GITHUB_TOKEN}                        @github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
-                    
-                    #git push https://${GIT_USERNAME}:${GIT_PASSWORD}        @github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
-                    #echo "Deployment file is successfully pushed!"
                 '''
             }
         }
@@ -106,10 +103,6 @@ pipeline {
             }
             }
         }
-
-
-
-
 
     }
 }
