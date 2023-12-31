@@ -81,7 +81,7 @@ pipeline {
                     git add deployment.yml
                     git commit -m "Update deployment image to version ${BUILD_NUMBER}"
                     
-                    # Push changes to the repository
+                    # Push changes to the repository using Git credentials
                     git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
                     echo "Deployment file is successfully pushed!"
                 '''
@@ -89,6 +89,7 @@ pipeline {
         }
     }
 }
+
 
 
 
