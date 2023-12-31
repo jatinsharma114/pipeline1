@@ -49,22 +49,20 @@ pipeline {
         // }
 
         stage('Update Deployment File For ArgoCD CD for K8C') {
-        environment {
+    environment {
         GIT_REPO_NAME = "pipeline1"
         GIT_USER_NAME = "jatinsharma114"
         APP_NAME = "jatinsharma114/pipeline1"
         IMAGE_TAG = "${BUILD_NUMBER}"
-        }
-        steps {
+    }
+    steps {
         withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
             script {
                 echo "Entered to the GitHub"
-
                 sh '''
                     echo "GitHub: Pushing deployment.yml for ArgoCD Deployment in EKS cluster::::::::::::::::::::::::"
                     git config user.email "jatin2010sharma@gmail.com"
                     git config user.name "Jatin Sharma"
-                    BUILD_NUMBER=${BUILD_NUMBER}
                     
                     # Error handling - exit immediately if any command fails
                     set -e
@@ -81,28 +79,28 @@ pipeline {
                     cat manifests/deployment.yml
                     
                     # Add and commit changes to GitHub repository
-                    git add deployment.yml
-                    git commit -m "Update deployment image to version ${BUILD_NUMBER}"
+                    git add manifests/deployment.yml
+                    git commit -m "Update deployment image to version ${IMAGE_TAG}"
                 '''
             }
         }
-        }
-        }
-    
+    }
+}
 
-        stage('Push the code to the GitHub') {
-        environment {
+stage('Push the code to GitHub') {
+    environment {
         GIT_REPO_NAME = "pipeline1"
         GIT_USER_NAME = "jatinsharma114"
-        }
-        steps {
+    }
+    steps {
         withCredentials([string(credentialsId: 'GitHub', variable: 'GITHUB_TOKEN')]) {
             echo "Pushing the code to Github..."
             sh "git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main"
             echo "Pushed successfully!"
-            }
-            }
         }
+    }
+}
+
 
     }
 }
