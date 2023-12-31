@@ -99,7 +99,7 @@ pipeline {
         GIT_USER_NAME = "jatinsharma114"
         }
         steps {
-        withCredentials([string(credentialsId: 'Github', variable: 'GITHUB_TOKEN')]) {
+        withCredentials([string(credentialsId: 'GitHub', variable: 'GITHUB_TOKEN')]) {
             echo "Pushing the code to Github..."
             sh "git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main"
             echo "Pushed successfully!"
