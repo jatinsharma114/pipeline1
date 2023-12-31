@@ -58,33 +58,28 @@ pipeline {
 		   echo "Entered to the GitHUB <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<@>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 		
       //       // withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
-      //           sh '''
-		    // echo "GitHub to push the deployment.yml file for ArgoCD Deployment in EKS cluster :::::::::::::::::::::::::::::::::::::::: "
+                sh '''
+		    echo "GitHub to push the deployment.yml file for ArgoCD Deployment in EKS cluster :::::::::::::::::::::::::::::::::::::::: "
 					
-      //               git config user.email "jatin2010sharma@gmail.com"
-      //               git config user.name "Jatin Sharma"
-      //               BUILD_NUMBER=${BUILD_NUMBER}
+                    git config user.email "jatin2010sharma@gmail.com"
+                    git config user.name "Jatin Sharma"
+                    BUILD_NUMBER=${BUILD_NUMBER}
 		    
-		    // //Give the path where the deployment.yml file is located. 
-      //               //Here We would search with the keyword APP_NAME: that anything ( .* ) matches with this, instead of v1 we replace with the Jenkins BUILD VERSION with image_name.
-      //               //It should be done in deployment.yml
-		    // sed -i "s/${APP_NAME}.*/${APP_NAME}:${IMAGE_TAG}/g" deployment.yml
+		    //Give the path where the deployment.yml file is located. 
+                    //Here We would search with the keyword APP_NAME: that anything ( .* ) matches with this, instead of v1 we replace with the Jenkins BUILD VERSION with image_name.
+                    //It should be done in deployment.yml
+		    sed -i "s/${APP_NAME}.*/${APP_NAME}:${IMAGE_TAG}/g" deployment.yml
 					
-		    // echo "Adding deployment file on the staging area! :::::::::::::::::::::::::::::::::::::::: "
-      //               git add deployment.yml
+		    echo "Adding deployment file on the staging area! :::::::::::::::::::::::::::::::::::::::: "
+                    git add deployment.yml
 					
-      //               git commit -m "Update deployment image to version ${BUILD_NUMBER}"
+                    git commit -m "Update deployment image to version ${BUILD_NUMBER}"
 		    
-		    // //make sure Barnch is main or master
-      //               git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
-      //           '''
-      //           }
-      //       }
+		    //make sure Barnch is main or master
+                    git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+                '''
+                }
+            }
         }
     }
 }
-
-
-
-
-
