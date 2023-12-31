@@ -46,45 +46,50 @@ pipeline {
         // }
 
         stage('Update Deployment File') {
-  		environment {
-        		GIT_REPO_NAME = "pipeline1"
-        		GIT_USER_NAME = "jatinsharma114"
-        		APP_NAME = "pipelineimg"
-        		IMAGE_TAG = "${BUILD_NUMBER}"
-    		}
-    	steps {
-        	withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-            		script {
-                		echo "Entered to the GitHUB <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<@>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+    	environment {
+        GIT_REPO_NAME = "pipeline1"
+        GIT_USER_NAME = "jatinsharma114"
+        APP_NAME = "jatinsharma114/pipeline1"
+        IMAGE_TAG = "${BUILD_NUMBER}"
+   	}
+ 	steps {
+        withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+            script {
+                echo "Entered to the GitHub"
 
-                		sh '''
-                    		echo "GitHub to push the deployment.yml file for ArgoCD Deployment in EKS cluster :::::::::::::::::::::::::::::::::::::::: "
+                sh '''
+                    echo "GitHub: Pushing deployment.yml for ArgoCD Deployment in EKS cluster"
+                    git config user.email "jatin2010sharma@gmail.com"
+                    git config user.name "Jatin Sharma"
+                    BUILD_NUMBER=${BUILD_NUMBER}
                     
-                    		git config user.email "jatin2010sharma@gmail.com"
-                    		git config user.name "Jatin Sharma"
-                    		BUILD_NUMBER=${BUILD_NUMBER}
+                    # Error handling - exit immediately if any command fails
+                    set -e
                     
-                    		# Give the path where the deployment.yml file is located.
-                    		# Here We would search with the keyword APP_NAME: that anything ( .* ) matches with this, instead of v1 we replace with the Jenkins BUILD VERSION with image_name.
-                    		# It should be done in deployment.yml
-                    		# sed -i "s/${APP_NAME}.*/${APP_NAME}:${IMAGE_TAG}/g" deployment.yml
-		      
-		      		sed -i "s/image: ${APP_NAME}:.*/image: ${APP_NAME}:${IMAGE_TAG}/g" deployment.yml
+                    # Display contents of deployment.yml before modification
+                    echo "Contents of deployment.yml BEFORE:"
+                    cat deployment.yml
+                    
+                    # Update image tag in deployment.yml based on BUILD_NUMBER
+                    sed -i "s/image: ${APP_NAME}:.*/image: ${APP_NAME}:${IMAGE_TAG}/g" deployment.yml
+                    
+                    # Display contents of deployment.yml after modification
+                    echo "Contents of deployment.yml AFTER:"
+                    cat deployment.yml
+                    
+                    # Add and commit changes to GitHub repository
+                    git add deployment.yml
+                    git commit -m "Update deployment image to version ${BUILD_NUMBER}"
+                    
+                    # Push changes to the repository
+                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+                    echo "Deployment file is successfully pushed!"
+                '''
+           	 }
+       	 }
+    	}
+        }
 
-                    
-                    		echo "Adding deployment file on the staging area! :::::::::::::::::::::::::::::::::::::::: "
-                    		git add deployment.yml
-                    
-                    		git commit -m "Update deployment image to version ${BUILD_NUMBER}"
-                    
-                    		# Make sure Branch is main or master
-                    		git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
-		      		echo "Deployment file is pushed Successfully! ::::::::::::::::::::::::::::::::::::: "
-                		'''
-           	 		}
-       		 }
-   		}
-	}
 
     }
 }
