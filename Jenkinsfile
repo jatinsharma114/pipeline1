@@ -71,14 +71,14 @@ pipeline {
                     
                     # Display contents of deployment.yml before modification
                     echo "Contents of deployment.yml BEFORE::::::::::::::::::::::::: "
-                    cat deployment.yml
+                    cat manifests/deployment.yml
                     
                     # Update image tag in deployment.yml based on BUILD_NUMBER
-                    sed -i "s#image: ${APP_NAME}:.*#image: ${APP_NAME}:${IMAGE_TAG}#g" deployment.yml
+                    sed -i "s#image: ${APP_NAME}:.*#image: ${APP_NAME}:${IMAGE_TAG}#g" manifests/deployment.yml
                     
                     # Display contents of deployment.yml after modification
                     echo "Contents of deployment.yml AFTER::::::::::::::::::::::::: "
-                    cat deployment.yml
+                    cat manifests/deployment.yml
                     
                     # Add and commit changes to GitHub repository
                     git add deployment.yml
