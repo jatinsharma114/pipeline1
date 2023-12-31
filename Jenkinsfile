@@ -67,7 +67,7 @@ pipeline {
                     		# Give the path where the deployment.yml file is located.
                     		# Here We would search with the keyword APP_NAME: that anything ( .* ) matches with this, instead of v1 we replace with the Jenkins BUILD VERSION with image_name.
                     		# It should be done in deployment.yml
-                    		// sed -i "s/${APP_NAME}.*/${APP_NAME}:${IMAGE_TAG}/g" deployment.yml
+                    		# sed -i "s/${APP_NAME}.*/${APP_NAME}:${IMAGE_TAG}/g" deployment.yml
 		      
 		      		sed -i "s/image: ${APP_NAME}:.*/image: ${APP_NAME}:${IMAGE_TAG}/g" deployment.yml
 
