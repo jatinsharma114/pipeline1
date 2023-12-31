@@ -46,13 +46,13 @@ pipeline {
         // }
 
         stage('Update Deployment File') {
-    	environment {
+    environment {
         GIT_REPO_NAME = "pipeline1"
         GIT_USER_NAME = "jatinsharma114"
         APP_NAME = "jatinsharma114/pipeline1"
         IMAGE_TAG = "${BUILD_NUMBER}"
-   	}
- 	steps {
+    }
+    steps {
         withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
             script {
                 echo "Entered to the GitHub"
@@ -71,7 +71,7 @@ pipeline {
                     cat deployment.yml
                     
                     # Update image tag in deployment.yml based on BUILD_NUMBER
-                    sed -i "s/image: ${APP_NAME}:.*/image: ${APP_NAME}:${IMAGE_TAG}/g" deployment.yml
+                    sed -i "s#image: ${APP_NAME}:.*#image: ${APP_NAME}:${IMAGE_TAG}#g" deployment.yml
                     
                     # Display contents of deployment.yml after modification
                     echo "Contents of deployment.yml AFTER:"
@@ -85,10 +85,11 @@ pipeline {
                     git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
                     echo "Deployment file is successfully pushed!"
                 '''
-           	 }
-       	 }
-    	}
+            }
         }
+    }
+}
+
 
 
     }
