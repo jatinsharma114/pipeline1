@@ -100,7 +100,9 @@ pipeline {
             }
             steps {
                 withCredentials([string(credentialsId: 'Github', variable: 'GITHUB_TOKEN')]) {
+                    echo "Pushing the code to the Github :)))))))))))))))))))) !!"
                     git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+                    echo "Pushed SUCCESSED !!!!"    
                 }
             }
         }
