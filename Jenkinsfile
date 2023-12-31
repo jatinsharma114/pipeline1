@@ -46,13 +46,13 @@ pipeline {
         // }
 
         stage('Update Deployment File') {
-    environment {
+        environment {
         GIT_REPO_NAME = "pipeline1"
         GIT_USER_NAME = "jatinsharma114"
         APP_NAME = "jatinsharma114/pipeline1"
         IMAGE_TAG = "${BUILD_NUMBER}"
-    }
-    steps {
+        }
+        steps {
         withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
             script {
                 echo "Entered to the GitHub"
@@ -89,23 +89,24 @@ pipeline {
                 '''
             }
         }
-    }
-}
-
+        }
+        }
+    
 
         stage('Push the code to the GitHub') {
-            environment {
-            GIT_REPO_NAME = "pipeline1"
-            GIT_USER_NAME = "jatinsharma114"
+        environment {
+        GIT_REPO_NAME = "pipeline1"
+        GIT_USER_NAME = "jatinsharma114"
+        }
+        steps {
+        withCredentials([string(credentialsId: 'Github', variable: 'GITHUB_TOKEN')]) {
+            echo "Pushing the code to Github..."
+            sh "git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main"
+            echo "Pushed successfully!"
             }
-            steps {
-                withCredentials([string(credentialsId: 'Github', variable: 'GITHUB_TOKEN')]) {
-                    echo "Pushing the code to the Github :)))))))))))))))))))) !!"
-                    git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
-                    echo "Pushed SUCCESSED !!!!"    
-                }
             }
         }
+
 
 
 
