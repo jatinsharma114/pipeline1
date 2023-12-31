@@ -82,13 +82,28 @@ pipeline {
                     git commit -m "Update deployment image to version ${BUILD_NUMBER}"
                     
                     # Push changes to the repository using Git credentials
-                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+                    git push https://${GITHUB_TOKEN}                        @github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+                    
+                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}        @github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
                     echo "Deployment file is successfully pushed!"
                 '''
             }
         }
     }
 }
+
+
+        stage('Push the code to the GitHub') {
+            environment {
+            GIT_REPO_NAME = "pipeline1"
+            GIT_USER_NAME = "jatinsharma114"
+            }
+            steps {
+                withCredentials([string(credentialsId: 'Github', variable: 'GITHUB_TOKEN')]) {
+                    git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+                }
+            }
+        }
 
 
 
