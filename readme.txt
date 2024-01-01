@@ -65,3 +65,8 @@ Now to access the container inside the Pod you can hit the
 
 
 ----------------------------------------------------------------------------------------------------------------------
+
+command to see the GUI for other component. !
+
+minikube addons enable metrics-server
+minikube dashboard
