@@ -52,7 +52,7 @@ pipeline {
     environment {
         GIT_REPO_NAME = "pipeline1"
         GIT_USER_NAME = "jatinsharma114"
-        APP_NAME = "jatinsharma114/pipeline1"
+        APP_NAME = "jatinsharma114/pipeline"
         IMAGE_TAG = "${BUILD_NUMBER}"
     }
     steps {
