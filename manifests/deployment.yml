@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: spring-boot-app
-        image: jatinsharma114/pipeline1:latest
+        image: jatinsharma14/pipelineimg
         ports:
         - containerPort: 8082
