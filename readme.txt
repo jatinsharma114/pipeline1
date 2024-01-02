@@ -59,9 +59,13 @@ NAME              TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
 kubernetes        ClusterIP   10.96.0.1       <none>        443/TCP        7h22m
 spring-boot-app   NodePort    10.187.128.26   <none>        80:31961/TCP   76m
 
+>> When type : NodePort 
 Now to access the container inside the Pod you can hit the 
 <minikubeIp>:<servicePort> 
 192.168.49.2:31961 
+
+>> When type : LoadBalancer 
+loadbancerHostname/home 
 
 
 ----------------------------------------------------------------------------------------------------------------------
