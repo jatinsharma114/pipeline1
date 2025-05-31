@@ -5,8 +5,8 @@ metadata:
 spec:
   type: NodePort
   ports:
-  - port: 80
-    targetPort: 8080 //application running on 
+  - port: 8083
+    targetPort: 8082 //application running on
     protocol: TCP
   selector:
     app: spring-boot-app
