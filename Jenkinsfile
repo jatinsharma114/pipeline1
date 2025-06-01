@@ -60,21 +60,16 @@ pipeline {
             script {
                 echo "Entered to the GitHub"
                 bat """
-                    echo GitHub: Pushing deployment.yml for ArgoCD Deployment in EKS cluster::::::::::::::::::::::::
-
-                    git config user.email "jatin2010sharma@gmail.com"
-                    git config user.name "Jatin Sharma"
-
                     echo Contents of deployment.yml BEFORE:::::::::::::::::::::::::
                     type manifests\\deployment.yml
 
-                    powershell -Command "(Get-Content manifests\\deployment.yml) -replace 'image: jatinsharma114/pipeline:.*', 'image: jatinsharma114/pipeline:${BUILD_NUMBER}' | Set-Content manifests\\deployment.yml"
+                    powershell -Command "(Get-Content manifests\deployment.yml) -replace 'image: ${env:APP_NAME}:.*', 'image: ${env:APP_NAME}:${env:IMAGE_TAG}' | Set-Content manifests\deployment.yml"
 
                     echo Contents of deployment.yml AFTER:::::::::::::::::::::::::
                     type manifests\\deployment.yml
 
                     git add manifests\\deployment.yml
-                    git commit -m "Update deployment image to version ${BUILD_NUMBER}"
+                    git commit -m \"Update deployment image to version ${BUILD_NUMBER}\"
                 """
             }
         }
