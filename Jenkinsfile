@@ -63,21 +63,23 @@ pipeline {
                     echo "GitHub: Pushing deployment.yml for ArgoCD Deployment in EKS cluster::::::::::::::::::::::::"
                     git config user.email "jatin2010sharma@gmail.com"
                     git config user.name "Jatin Sharma"
-                    
+
                     # Error handling - exit immediately if any command fails
                     set -e
-                    
+
                     # Display contents of deployment.yml before modification
                     echo "Contents of deployment.yml BEFORE::::::::::::::::::::::::: "
                     cat manifests/deployment.yml
-                    
+
                     # Update image tag in deployment.yml based on BUILD_NUMBER
+                    #sed --> stream editor --> s#pattern_to_find#reaplacement#g
+                    #sed -i "s#image: jatinsharma114/pipeline:.*#image: jatinsharma114/pipeline:${BUILD_NUMBER}#g" manifests/deployment.yml
                     sed -i "s#image: ${APP_NAME}:.*#image: ${APP_NAME}:${IMAGE_TAG}#g" manifests/deployment.yml
-                    
+
                     # Display contents of deployment.yml after modification
                     echo "Contents of deployment.yml AFTER::::::::::::::::::::::::: "
                     cat manifests/deployment.yml
-                    
+
                     # Add and commit changes to GitHub repository
                     git add manifests/deployment.yml
                     git commit -m "Update deployment image to version ${IMAGE_TAG}"
