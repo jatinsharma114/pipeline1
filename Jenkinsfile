@@ -6,6 +6,7 @@ pipeline {
     }
 
     stages {
+
         stage('GitHub Main Branch checkout') {
             steps {
                 // Get some code from a GitHub repository
@@ -49,47 +50,61 @@ pipeline {
         // }
 
         stage('Update Deployment File For ArgoCD CD for K8C') {
-    environment {
-        GIT_REPO_NAME = "pipeline1"
-        GIT_USER_NAME = "jatinsharma114"
-        APP_NAME = "jatinsharma114/pipeline"
-        IMAGE_TAG = "${BUILD_NUMBER}"
-    }
-    steps {
-        withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-            script {
-                echo "Entered to the GitHub"
-                bat """
-                    echo Contents of deployment.yml BEFORE:::::::::::::::::::::::::
-                    type manifests\\deployment.yml
+            environment {
+                GIT_REPO_NAME = "pipeline1"
+                GIT_USER_NAME = "jatinsharma114"
+                APP_NAME = "jatinsharma114/pipeline"
+                IMAGE_TAG = "${BUILD_NUMBER}"
+            }
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'github',
+                                                  passwordVariable: 'GIT_PASSWORD',
+                                                  usernameVariable: 'GIT_USERNAME')]) {
+                    script {
+                        echo "Entered GitHub credentials block"
 
-                    powershell -Command "(Get-Content 'manifests\\deployment.yml') -replace 'image: jatinsharma14/pipelineimg.*', 'image: jatinsharma14/pipelineimg:${env.IMAGE_TAG}' | Set-Content 'manifests\\deployment.yml'"
+                        bat """
+                            echo Setting Git config...
+                            git config user.email "jatin2010sharma@gmail.com"
+                            git config user.name "Jatin Sharma"
 
-                    echo Contents of deployment.yml AFTER:::::::::::::::::::::::::
-                    type manifests\\deployment.yml
+                            echo.
+                            echo Contents of deployment.yml BEFORE :::::::::::::::::::::::::
+                            type manifests\\deployment.yml
 
-                    git add manifests\\deployment.yml
-                    git commit -m \"Update deployment image to version ${BUILD_NUMBER}\"
-                """
+                            echo.
+                            echo Replacing image tag using PowerShell...
+                            powershell -NoProfile -Command ^
+                              "(Get-Content manifests\\deployment.yml) -replace 'image: ${APP_NAME}:.*', 'image: ${APP_NAME}:${IMAGE_TAG}' | Set-Content manifests\\deployment.yml"
+
+                            echo.
+                            echo Contents of deployment.yml AFTER :::::::::::::::::::::::::
+                            type manifests\\deployment.yml
+
+                            echo.
+                            echo Git add and commit...
+                            git add manifests\\deployment.yml
+                            git commit -m \"Update deployment image to version ${IMAGE_TAG}\"
+                        """
+                    }
+                }
             }
         }
-    }
-}
 
-stage('Push the code to GitHub') {
-    environment {
-        GIT_REPO_NAME = "pipeline1"
-        GIT_USER_NAME = "jatinsharma114"
-    }
-    steps {
-        withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
-            echo "Pushing the code to Github...${GITHUB_TOKEN}"
-//             bat "git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main"
-//             echo "Pushed successfully!"
+        stage('Push the code to GitHub') {
+            environment {
+                GIT_REPO_NAME = "pipeline1"
+                GIT_USER_NAME = "jatinsharma114"
+            }
+            steps {
+                withCredentials([string(credentialsId: 'gitHub', variable: 'GITHUB_TOKEN')]) {
+                    echo "Pushing the code to GitHub..."
+                    bat """
+                        git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+                    """
+                    echo "Pushed successfully!"
+                }
+            }
         }
-    }
-}
-
-
     }
 }
