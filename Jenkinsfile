@@ -63,7 +63,7 @@ pipeline {
                     echo Contents of deployment.yml BEFORE:::::::::::::::::::::::::
                     type manifests\\deployment.yml
 
-                    powershell -Command "(Get-Content 'manifests\\deployment.yml') -replace 'image: ${env.APP_NAME}:.*', 'image: ${env.APP_NAME}:${env.IMAGE_TAG}' | Set-Content 'manifests\\deployment.yml'"
+                    powershell -Command "(Get-Content 'manifests\\deployment.yml') -replace 'image: jatinsharma14/pipelineimg.*', 'image: jatinsharma14/pipelineimg:${env.IMAGE_TAG}' | Set-Content 'manifests\\deployment.yml'"
 
                     echo Contents of deployment.yml AFTER:::::::::::::::::::::::::
                     type manifests\\deployment.yml
