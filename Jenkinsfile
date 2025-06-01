@@ -27,8 +27,8 @@ pipeline {
                 bat "docker build -t pipelineimg ."
             }
         }
-        
-        //{BUILD_NUMBER} is an env variable is Jenkins 
+
+        //{BUILD_NUMBER} is an env variable is Jenkins
         stage("Push to DockerHub"){
             steps{
                 echo "The build number is : ${env.BUILD_NUMBER}"
@@ -44,7 +44,7 @@ pipeline {
 
         // stage('Email notification Sending') {
         //     steps {
-        //         mail bcc: '', body: 'From SMTP bhai', cc: '', from: '', replyTo: '', subject: 'MAIL', to: 'jatin2010sharma@gmail.com'            
+        //         mail bcc: '', body: 'From SMTP bhai', cc: '', from: '', replyTo: '', subject: 'MAIL', to: 'jatin2010sharma@gmail.com'
         //     }
         // }
 
@@ -83,9 +83,9 @@ stage('Push the code to GitHub') {
     }
     steps {
         withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
-            echo "Pushing the code to Github..."
-            bat "git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main"
-            echo "Pushed successfully!"
+            echo "Pushing the code to Github...${GITHUB_TOKEN}"
+//             bat "git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main"
+//             echo "Pushed successfully!"
         }
     }
 }
