@@ -61,15 +61,15 @@ pipeline {
                 echo "Entered to the GitHub"
                 bat """
                     echo Contents of deployment.yml BEFORE:::::::::::::::::::::::::
-                    type manifests\\deployment.yml
+                    type manifests/deployment.yml
 
-                    powershell -Command "(Get-Content manifests\deployment.yml) -replace 'image: ${env:APP_NAME}:.*', 'image: ${env:APP_NAME}:${env:IMAGE_TAG}' | Set-Content manifests\deployment.yml"
+                    powershell -Command "(Get-Content manifests/deployment.yml) -replace 'image: ${env.APP_NAME}:.*', 'image: ${env.APP_NAME}:${env.IMAGE_TAG}' | Set-Content manifests/deployment.yml"
 
                     echo Contents of deployment.yml AFTER:::::::::::::::::::::::::
-                    type manifests\\deployment.yml
+                    type manifests/deployment.yml
 
-                    git add manifests\\deployment.yml
-                    git commit -m \"Update deployment image to version ${BUILD_NUMBER}\"
+                    git add manifests/deployment.yml
+                    git commit -m "Update deployment image to version ${BUILD_NUMBER}"
                 """
             }
         }
