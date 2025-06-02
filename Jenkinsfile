@@ -24,7 +24,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 echo 'Build Docker Image::::::::::::::::::::::::'
-                bat "docker build -t pipelineimg ."
+                bat "docker build -t pipeline ."
             }
         }
 
@@ -34,9 +34,9 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: "dockerhub", passwordVariable: "dockerHubPass", usernameVariable: "dockerHubUser")]) {
                     bat "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
                     echo "Login to Dockerhub ::::::::::::::::::::::::"
-                    bat "docker tag pipelineimg ${env.dockerHubUser}/pipelineimg:${BUILD_NUMBER}"
+                    bat "docker tag pipeline ${env.dockerHubUser}/pipeline:${BUILD_NUMBER}"
                     echo "Now pushing the image to Dockerhub ::::::::::::::::::::::::"
-                    bat "docker push ${env.dockerHubUser}/pipelineimg:${BUILD_NUMBER}"
+                    bat "docker push ${env.dockerHubUser}/pipeline:${BUILD_NUMBER}"
                 }
             }
         }
