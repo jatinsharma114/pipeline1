@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent { label 'windows' }
 
     environment {
         IMAGE_TAG = "${BUILD_NUMBER}"
@@ -17,7 +17,7 @@ pipeline {
         stage('Maven Clean Install') {
             steps {
                 echo 'Maven Clean Install::::::::::::::::::::::::'
-                sh "mvn clean install"
+                bat "mvn clean install"
                 echo 'Maven Clean Install Done::::::::::::::::::::::::'
             }
         }
@@ -25,71 +25,54 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 echo 'Build Docker Image::::::::::::::::::::::::'
-                sh "docker build -t pipelineimg ."
+                bat "docker build -t pipelineimg ."
             }
         }
 
-        //{BUILD_NUMBER} is an env variable is Jenkins
-        stage("Push to DockerHub"){
-            steps{
+        stage("Push to DockerHub") {
+            steps {
                 echo "The build number is : ${env.BUILD_NUMBER}"
-                withCredentials([usernamePassword(credentialsId:"dockerhub",passwordVariable:"dockerHubPass",usernameVariable:"dockerHubUser")]){
-                    sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
-                    echo "Login to Dockerhub :::::::::::::::::::::::: "
-                    sh "docker tag pipelineimg ${env.dockerHubUser}/pipelineimg:${BUILD_NUMBER}"
-                    echo "Now pushing the image to Dockerhub :::::::::::::::::::::::: "
-                    sh "docker push ${env.dockerHubUser}/pipelineimg:${BUILD_NUMBER}"
+                withCredentials([usernamePassword(credentialsId: "dockerhub", passwordVariable: "dockerHubPass", usernameVariable: "dockerHubUser")]) {
+                    bat """
+                        docker login -u ${dockerHubUser} -p ${dockerHubPass}
+                        echo Login to DockerHub ::::::::::::::::::::::::
+                        docker tag pipelineimg ${dockerHubUser}/pipelineimg:${BUILD_NUMBER}
+                        echo Now pushing the image to DockerHub ::::::::::::::::::::::::
+                        docker push ${dockerHubUser}/pipelineimg:${BUILD_NUMBER}
+                    """
                 }
             }
         }
-
-        // stage('Email notification Sending') {
-        //     steps {
-        //         mail bcc: '', body: 'From SMTP bhai', cc: '', from: '', replyTo: '', subject: 'MAIL', to: 'jatin2010sharma@gmail.com'
-        //     }
-        // }
 
         stage('Update Deployment File For ArgoCD CD for K8C') {
             environment {
                 GIT_REPO_NAME = "pipeline1"
                 GIT_USER_NAME = "jatinsharma114"
-                APP_NAME = "jatinsharma114/pipeline"
-                IMAGE_TAG = "${BUILD_NUMBER}"
+                APP_NAME      = "jatinsharma114/pipeline"
+                IMAGE_TAG     = "${BUILD_NUMBER}"
             }
             steps {
                 withCredentials([string(credentialsId: 'gitHub', variable: 'GITHUB_TOKEN')]) {
-                    script {
-                        echo "Entered to the GitHub"
-                        sh '''
-                            echo "GitHub: Pushing deployment.yml for ArgoCD Deployment in EKS cluster::::::::::::::::::::::::"
-                            git config user.email "jatin2010sharma@gmail.com"
-                            git config user.name "Jatin Sharma"
+                    echo "Updating deployment.yml in GitHub for ArgoCD deployment on EKS::::::::::::::::::::::::"
+                    bat """
+                        git config user.email "jatin2010sharma@gmail.com"
+                        git config user.name "Jatin Sharma"
 
+                        REM Display contents of deployment.yml BEFORE modification
+                        echo Contents of deployment.yml BEFORE:::::::::::::::::::::::::
+                        type manifests\\deployment.yml
 
-                            # Error handling - exit immediately if any command fails
-                            set -e
+                        REM Update the image tag using PowerShell replace
+                        powershell -Command "(Get-Content 'manifests\\deployment.yml') -replace 'image: ${APP_NAME}:.*','image: ${APP_NAME}:${IMAGE_TAG}' | Set-Content 'manifests\\deployment.yml'"
 
-                            # Display contents of deployment.yml before modification
-                            echo "Contents of deployment.yml BEFORE::::::::::::::::::::::::: "
-                            cat manifests/deployment.ymlAdd commentMore actions
+                        REM Display contents of deployment.yml AFTER modification
+                        echo Contents of deployment.yml AFTER:::::::::::::::::::::::::
+                        type manifests\\deployment.yml
 
-
-                            # Update image tag in deployment.yml based on BUILD_NUMBER
-                            #sed --> stream editor --> s#pattern_to_find#reaplacement#g
-                            #sed -i "s#image: jatinsharma114/pipeline:.*#image: jatinsharma114/pipeline:${BUILD_NUMBER}#g" manifests/deployment.yml
-                            sed -i "s#image: ${APP_NAME}:.*#image: ${APP_NAME}:${IMAGE_TAG}#g" manifests/deployment.yml
-
-
-                            # Display contents of deployment.yml after modification
-                            echo "Contents of deployment.yml AFTER::::::::::::::::::::::::: "
-                            cat manifests/deployment.yml
-
-
-                            # Add and commit changes to GitHub repository
-                            git add manifests/deployment.yml
-                            git commit -m "Update deployment image to version ${IMAGE_TAG}"
-                        '''
-                    }
+                        REM Stage and commit the change
+                        git add manifests\\deployment.yml
+                        git commit -m \"Update deployment image to version ${IMAGE_TAG}\"
+                    """
                 }
             }
         }
@@ -101,11 +84,12 @@ pipeline {
             }
             steps {
                 withCredentials([string(credentialsId: 'gitHub', variable: 'GITHUB_TOKEN')]) {
-                    echo "Pushing the code to Github..."
-                    sh "git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main"
+                    echo "Pushing the code to GitHub..."
+                    bat "git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main"
                     echo "Pushed successfully!"
                 }
             }
         }
+
     }
 }
