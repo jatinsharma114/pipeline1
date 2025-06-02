@@ -5,44 +5,44 @@ pipeline {
         IMAGE_TAG = "${BUILD_NUMBER}"
     }
 
-    stages {
-
-        stage('GitHub Main Branch checkout') {
-            steps {
-                // Get some code from a GitHub repository
-                git url: 'https://github.com/jatinsharma114/pipeline1.git', branch: 'main'
-            }
-        }
-
-        stage('Maven Clean Install') {
-            steps {
-                echo 'Maven Clean Install::::::::::::::::::::::::'
-                bat "mvn clean install"
-                echo 'Maven Clean Install Done::::::::::::::::::::::::'
-            }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                echo 'Build Docker Image::::::::::::::::::::::::'
-                bat "docker build -t pipelineimg ."
-            }
-        }
-
-        stage("Push to DockerHub") {
-            steps {
-                echo "The build number is : ${env.BUILD_NUMBER}"
-                withCredentials([usernamePassword(credentialsId: "dockerhub", passwordVariable: "dockerHubPass", usernameVariable: "dockerHubUser")]) {
-                    bat """
-                        docker login -u ${dockerHubUser} -p ${dockerHubPass}
-                        echo Login to DockerHub ::::::::::::::::::::::::
-                        docker tag pipelineimg ${dockerHubUser}/pipelineimg:${BUILD_NUMBER}
-                        echo Now pushing the image to DockerHub ::::::::::::::::::::::::
-                        docker push ${dockerHubUser}/pipelineimg:${BUILD_NUMBER}
-                    """
-                }
-            }
-        }
+//     stages {
+//
+//         stage('GitHub Main Branch checkout') {
+//             steps {
+//                 // Get some code from a GitHub repository
+//                 git url: 'https://github.com/jatinsharma114/pipeline1.git', branch: 'main'
+//             }
+//         }
+//
+//         stage('Maven Clean Install') {
+//             steps {
+//                 echo 'Maven Clean Install::::::::::::::::::::::::'
+//                 bat "mvn clean install"
+//                 echo 'Maven Clean Install Done::::::::::::::::::::::::'
+//             }
+//         }
+//
+//         stage('Build Docker Image') {
+//             steps {
+//                 echo 'Build Docker Image::::::::::::::::::::::::'
+//                 bat "docker build -t pipelineimg ."
+//             }
+//         }
+//
+//         stage("Push to DockerHub") {
+//             steps {
+//                 echo "The build number is : ${env.BUILD_NUMBER}"
+//                 withCredentials([usernamePassword(credentialsId: "dockerhub", passwordVariable: "dockerHubPass", usernameVariable: "dockerHubUser")]) {
+//                     bat """
+//                         docker login -u ${dockerHubUser} -p ${dockerHubPass}
+//                         echo Login to DockerHub ::::::::::::::::::::::::
+//                         docker tag pipelineimg ${dockerHubUser}/pipelineimg:${BUILD_NUMBER}
+//                         echo Now pushing the image to DockerHub ::::::::::::::::::::::::
+//                         docker push ${dockerHubUser}/pipelineimg:${BUILD_NUMBER}
+//                     """
+//                 }
+//             }
+//         }
 
         stage('Update Deployment File For ArgoCD CD for K8C') {
             environment {
@@ -77,19 +77,19 @@ pipeline {
             }
         }
 
-        stage('Push the code to GitHub') {
-            environment {
-                GIT_REPO_NAME = "pipeline1"
-                GIT_USER_NAME = "jatinsharma114"
-            }
-            steps {
-                withCredentials([string(credentialsId: 'gitHub', variable: 'GITHUB_TOKEN')]) {
-                    echo "Pushing the code to GitHub..."
-                    bat "git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main"
-                    echo "Pushed successfully!"
-                }
-            }
-        }
+//         stage('Push the code to GitHub') {
+//             environment {
+//                 GIT_REPO_NAME = "pipeline1"
+//                 GIT_USER_NAME = "jatinsharma114"
+//             }
+//             steps {
+//                 withCredentials([string(credentialsId: 'gitHub', variable: 'GITHUB_TOKEN')]) {
+//                     echo "Pushing the code to GitHub..."
+//                     bat "git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main"
+//                     echo "Pushed successfully!"
+//                 }
+//             }
+//         }
 
     }
 }
