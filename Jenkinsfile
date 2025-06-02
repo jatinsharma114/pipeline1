@@ -68,7 +68,7 @@ pipeline {
 
                         REM Stage and commit the change
                         git add manifests\\deployment.yml
-                        git commit -m \\"Update deployment image to version ${IMAGE_TAG}\\"
+                        git commit -m "Update deployment image to version ${IMAGE_TAG}"
                     """
                 }
             }
