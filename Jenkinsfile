@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'windows' }
+    agent any
 
     environment {
         IMAGE_TAG = "${BUILD_NUMBER}"
