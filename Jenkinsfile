@@ -24,7 +24,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 echo 'Build Docker Image::::::::::::::::::::::::'
-                bat "docker build -t pipeline ."
+                bat "docker build -t pipelineimg ."
             }
         }
 
@@ -34,9 +34,9 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: "dockerhub", passwordVariable: "dockerHubPass", usernameVariable: "dockerHubUser")]) {
                     bat "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
                     echo "Login to Dockerhub ::::::::::::::::::::::::"
-                    bat "docker tag pipeline ${env.dockerHubUser}/pipeline:${BUILD_NUMBER}"
+                    bat "docker tag pipelineimg ${env.dockerHubUser}/pipelineimg:${BUILD_NUMBER}"
                     echo "Now pushing the image to Dockerhub ::::::::::::::::::::::::"
-                    bat "docker push ${env.dockerHubUser}/pipeline:${BUILD_NUMBER}"
+                    bat "docker push ${env.dockerHubUser}/pipelineimg:${BUILD_NUMBER}"
                 }
             }
         }
@@ -45,7 +45,7 @@ pipeline {
             environment {
                 GIT_REPO_NAME = "pipeline1"
                 GIT_USER_NAME = "jatinsharma114"
-                APP_NAME      = "jatinsharma114/pipeline"
+                APP_NAME      = "jatinsharma14/pipelineimg"
                 IMAGE_TAG     = "${BUILD_NUMBER}"
             }
             steps {
@@ -60,7 +60,7 @@ pipeline {
                         type manifests\\deployment.yml
 
                         REM Update the image tag using PowerShell replace
-                        powershell -Command "(Get-Content 'manifests\\deployment.yml') -replace 'image: ${APP_NAME}:.*','image: ${APP_NAME}:${IMAGE_TAG}' | Set-Content 'manifests\\deployment.yml'"
+                        powershell -Command "(Get-Content 'manifests\\deployment.yml') -replace 'image: ${APP_NAME}:.*', 'image: ${APP_NAME}:${IMAGE_TAG}' | Set-Content 'manifests\\deployment.yml'"
 
                         REM Display contents of deployment.yml AFTER modification
                         echo Contents of deployment.yml AFTER:::::::::::::::::::::::::
