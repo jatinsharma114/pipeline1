@@ -60,7 +60,7 @@ pipeline {
                         type manifests\\deployment.yml
 
                         REM Update the image tag using PowerShell replace
-                        powershell -Command "(Get-Content 'manifests\\deployment.yml') -replace 'image: ${APP_NAME}:.*', 'image: ${APP_NAME}:${IMAGE_TAG}' | Set-Content 'manifests\\deployment.yml'"
+                        powershell -Command "(Get-Content 'manifests\\deployment.yml') -replace 'image: ${APP_NAME}(:.*)?', 'image: ${APP_NAME}:${IMAGE_TAG}' | Set-Content 'manifests\\deployment.yml'"
 
                         REM Display contents of deployment.yml AFTER modification
                         echo Contents of deployment.yml AFTER:::::::::::::::::::::::::
