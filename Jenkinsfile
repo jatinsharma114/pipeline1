@@ -15,7 +15,7 @@ pipeline {
                 IMAGE_TAG     = "${BUILD_NUMBER}"
             }
             steps {
-                withCredentials([string(credentialsId: 'gitHub', variable: 'GITHUB_TOKEN')]) {
+                withCredentials([string(credentialsId: 'GitHub', variable: 'GITHUB_TOKEN')]) {
                     echo "Updating deployment.yml in GitHub for ArgoCD deployment on EKS::::::::::::::::::::::::"
                     bat """
                         git config user.email "jatin2010sharma@gmail.com"
