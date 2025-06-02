@@ -6,6 +6,40 @@ pipeline {
     }
 
     stages {
+        stage('GitHub Main Branch checkout') {
+            steps {
+                // Get some code from a GitHub repository
+                git url: 'https://github.com/jatinsharma114/pipeline1.git', branch: 'main'
+            }
+        }
+
+        stage('Maven Clean Install') {
+            steps {
+                echo 'Maven Clean Install::::::::::::::::::::::::'
+                bat "mvn clean install"
+                echo 'Maven Clean Install Done::::::::::::::::::::::::'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                echo 'Build Docker Image::::::::::::::::::::::::'
+                bat "docker build -t pipelineimg ."
+            }
+        }
+
+        stage("Push to DockerHub") {
+            steps {
+                echo "The build number is : ${env.BUILD_NUMBER}"
+                withCredentials([usernamePassword(credentialsId: "dockerhub", passwordVariable: "dockerHubPass", usernameVariable: "dockerHubUser")]) {
+                    bat "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
+                    echo "Login to Dockerhub ::::::::::::::::::::::::"
+                    bat "docker tag pipelineimg ${env.dockerHubUser}/pipelineimg:${BUILD_NUMBER}"
+                    echo "Now pushing the image to Dockerhub ::::::::::::::::::::::::"
+                    bat "docker push ${env.dockerHubUser}/pipelineimg:${BUILD_NUMBER}"
+                }
+            }
+        }
 
         stage('Update Deployment File For ArgoCD CD for K8C') {
             environment {
@@ -34,11 +68,24 @@ pipeline {
 
                         REM Stage and commit the change
                         git add manifests\\deployment.yml
-                        git commit -m \"Update deployment image to version ${IMAGE_TAG}\"
+                        git commit -m \\"Update deployment image to version ${IMAGE_TAG}\\"
                     """
                 }
             }
         }
 
+        stage('Push the code to GitHub') {
+            environment {
+                GIT_REPO_NAME = "pipeline1"
+                GIT_USER_NAME = "jatinsharma114"
+            }
+            steps {
+                withCredentials([string(credentialsId: 'GitHub', variable: 'GITHUB_TOKEN')]) {
+                    echo "Pushing the code to Github..."
+                    bat "git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main"
+                    echo "Pushed successfully!"
+                }
+            }
+        }
     }
 }
