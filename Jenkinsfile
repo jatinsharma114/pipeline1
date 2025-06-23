@@ -19,6 +19,12 @@ pipeline {
             }
         }
 
+         stage('Maven Clean Install') {
+            steps {
+                sh "mvn clean install"
+            }
+         }
+
         stage('Build Docker Image') {
             steps {
                 script {
