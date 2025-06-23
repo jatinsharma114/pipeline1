@@ -59,8 +59,8 @@ pipeline {
 
         stage('Update Deployment File and Push to GitHub') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'GitHub', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
-                    sh """
+                withCredentials([string(credentialsId: 'GitHub', variable: 'GIT_TOKEN')]) {
+                    sh '''
                     echo "Updating image tag in ${DEPLOY_FILE}..."
                     ls -la manifests/develop
                     git config --global user.name "${USER_NAME}"
@@ -70,8 +70,8 @@ pipeline {
 
                     git add ${DEPLOY_FILE}
                     git commit -m "Update image to ${IMAGE_TAG} for ${BRANCH}"
-                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/jatinsharma114/pipeline1.git HEAD:${BRANCH}
-                    """
+                    git push https://${GIT_TOKEN}@github.com/jatinsharma114/pipeline1.git HEAD:${BRANCH}
+                    '''
                 }
             }
         }
