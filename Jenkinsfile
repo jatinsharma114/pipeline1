@@ -62,13 +62,12 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'GitHub', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
                     sh """
                     echo "Updating image tag in ${DEPLOY_FILE}..."
-
+                    ls -la manifests/develop
                     git config --global user.name "${USER_NAME}"
                     git config --global user.email "${USER_EMAIL}"
 
                     sed -i "s|image: .*|image: ${ECR_REPO}:${IMAGE_TAG}|" ${DEPLOY_FILE}
 
-                    echo "Committing changes..."
                     git add ${DEPLOY_FILE}
                     git commit -m "Update image to ${IMAGE_TAG} for ${BRANCH}"
                     git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/jatinsharma114/pipeline1.git HEAD:${BRANCH}
