@@ -12,7 +12,7 @@ pipeline {
         BRANCH = "develop"
         USER_NAME = "Jatin Sharma"
         USER_EMAIL = "jatin2010sharma@gmail.com"
-        DEPLOY_FILE = "manifests/develop/deployment.yaml"
+        DEPLOY_FILE = "manifests/develop/deployment.yml"
     }
 
     stages {
