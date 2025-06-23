@@ -3,96 +3,83 @@ pipeline {
 
     environment {
         IMAGE_TAG = "${BUILD_NUMBER}"
+        ECR_NAME = 'pipeline'
+        AWS_REGION = 'us-east-1'
+        AWS_ACCOUNT_ID = '839133527922'
+        ECR_REPO = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_NAME}"
+        GITHUB_REPO = 'https://github.com/jatinsharma114/pipeline1.git'
+        AWS_CREDENTIALS_ID = "aws-creds-id"
+        BRANCH = "develop"
+        USER_NAME = "Jatin Sharma"
+        USER_EMAIL = "jatin2010sharma@gmail.com"
+        DEPLOY_FILE = "manifests/${BRANCH}/deployment.yml"
     }
 
     stages {
-        stage('GitHub Main Branch checkout') {
+        stage('Clone from GitHub') {
             steps {
-                git url: 'https://github.com/jatinsharma114/pipeline1.git', branch: 'main'
+                git branch: "${BRANCH}", url: "${GITHUB_REPO}"
             }
         }
 
         stage('Maven Clean Install') {
             steps {
-                echo 'Maven Clean Install::::::::::::::::::::::::'
                 sh "mvn clean install"
-                echo 'Maven Clean Install Done::::::::::::::::::::::::'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                echo 'Build Docker Image::::::::::::::::::::::::'
-                sh "docker build -t pipelineimg ."
+                sh "docker build -t ${ECR_NAME}:${IMAGE_TAG} ."
             }
         }
 
-        stage("Push to DockerHub") {
+        stage('Login to ECR') {
             steps {
-                echo "The build number is : ${env.BUILD_NUMBER}"
-                withCredentials([usernamePassword(credentialsId: "dockerhub", passwordVariable: "dockerHubPass", usernameVariable: "dockerHubUser")]) {
-                    sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
-                    echo "Login to Dockerhub ::::::::::::::::::::::::"
-                    sh "docker tag pipelineimg ${env.dockerHubUser}/pipelineimg:${BUILD_NUMBER}"
-                    echo "Now pushing the image to Dockerhub ::::::::::::::::::::::::"
-                    sh "docker push ${env.dockerHubUser}/pipelineimg:${BUILD_NUMBER}"
+                withAWS(credentials: "${AWS_CREDENTIALS_ID}", region: "${AWS_REGION}") {
+                    sh """
+                    aws ecr get-login-password --region ${AWS_REGION} | \
+                    docker login --username AWS --password-stdin ${ECR_REPO}
+                    """
                 }
             }
         }
 
-        // Uncomment to enable email notification
-        // stage('Email notification Sending') {
-        //     steps {
-        //         mail bcc: '', body: 'From SMTP bhai', cc: '', from: '', replyTo: '', subject: 'MAIL', to: 'jatin2010sharma@gmail.com'
-        //     }
-        // }
-
-        stage('Update Deployment File For ArgoCD CD for K8C') {
-            environment {
-                GIT_REPO_NAME = "pipeline1"
-                GIT_USER_NAME = "jatinsharma114"
-                APP_NAME = "jatinsharma114/pipeline"
-                IMAGE_TAG = "${BUILD_NUMBER}"
-            }
+        stage('Tag to ECR') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                    script {
-                        echo "Entered to the GitHub"
-                        sh '''
-                            echo "GitHub: Pushing deployment.yml for ArgoCD Deployment in EKS cluster::::::::::::::::::::::::"
-                            git config user.email "jatin2010sharma@gmail.com"
-                            git config user.name "Jatin Sharma"
-
-                            set -e
-
-                            echo "Contents of deployment.yml BEFORE::::::::::::::::::::::::: "
-                            cat manifests/deployment.yml
-
-                            sed -i "s#image: .*/.*:.*#image: jatinsharma114/pipeline:${BUILD_NUMBER}#g" manifests/deployment.yml
-
-                            echo "Contents of deployment.yml AFTER::::::::::::::::::::::::: "
-                            cat manifests/deployment.yml
-
-                            git add manifests/deployment.yml
-                            git commit -m "Update deployment image to version ${BUILD_NUMBER}"
-                        '''
-                    }
-                }
+                sh "docker tag ${ECR_NAME}:${IMAGE_TAG} ${ECR_REPO}:${IMAGE_TAG}"
             }
         }
 
-        stage('Push the code to GitHub') {
-            environment {
-                GIT_REPO_NAME = "pipeline1"
-                GIT_USER_NAME = "jatinsharma114"
-            }
+        stage('Push to ECR') {
             steps {
-                withCredentials([string(credentialsId: 'GitHub', variable: 'GITHUB_TOKEN')]) {
-                    echo "Pushing the code to Github..."
-                    sh "git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main"
-                    echo "Pushed successfully!"
+                sh "docker push ${ECR_REPO}:${IMAGE_TAG}"
+            }
+        }
+
+        stage('Update Deployment File and Push to GitHub') {
+            steps {
+                withCredentials([string(credentialsId: 'GitHub', variable: 'GIT_TOKEN')]) {
+                    sh '''
+                    echo "Updating image tag in ${DEPLOY_FILE}..."
+                    ls -la manifests/develop
+                    git config --global user.name "${USER_NAME}"
+                    git config --global user.email "${USER_EMAIL}"
+
+                    sed -i "s|image: .*|image: ${ECR_REPO}:${IMAGE_TAG}|" ${DEPLOY_FILE}
+
+                    git add ${DEPLOY_FILE}
+                    git commit -m "Update image to ${IMAGE_TAG} for ${BRANCH}"
+                    git push https://${GIT_TOKEN}@github.com/jatinsharma114/pipeline1.git HEAD:${BRANCH}
+                    '''
                 }
             }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
         }
     }
 }
