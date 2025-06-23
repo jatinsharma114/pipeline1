@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: spring-boot-app
-        image: jatinsharma14/pipelineimg:38
+        image: 839133527922.dkr.ecr.us-east-1.amazonaws.com/pipeline:12
         ports:
         - containerPort: 8082
