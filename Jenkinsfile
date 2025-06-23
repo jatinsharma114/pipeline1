@@ -8,6 +8,7 @@ pipeline {
     stages {
         stage('GitHub Main Branch checkout') {
             steps {
+                echo 'Checkout develop Branch ::::::::::::::::::::::::'
                 git url: 'https://github.com/jatinsharma114/pipeline1.git', branch: 'develop'
             }
         }
