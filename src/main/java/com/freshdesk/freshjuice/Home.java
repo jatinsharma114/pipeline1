@@ -6,9 +6,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class Home {
 
-    @GetMapping("/home")
-    public String home() {
-        return "This application is running fine!! version 30-5-2025";
+    @GetMapping("/")
+    public String health() {
+        return "You are getting the reponse from the Git pipline!";
+    }
+
+    @GetMapping("/payment")
+    public String paymentCheckOut() {
+        return "Payment checkout Done!";
+    }
+
+    @GetMapping("/blog")
+    public String blog() {
+        return "Blog viewer..!";
     }
 
 

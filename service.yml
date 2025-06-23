@@ -6,7 +6,7 @@ spec:
   type: NodePort
   ports:
   - port: 8083
-    targetPort: 8082 //application running on
+    targetPort: 8082
     protocol: TCP
   selector:
     app: spring-boot-app
