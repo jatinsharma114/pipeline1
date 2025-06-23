@@ -2,14 +2,17 @@ pipeline {
     agent any
 
     environment {
+        IMAGE_TAG = "${BUILD_NUMBER}"
         ECR_NAME = 'pipeline'
         AWS_REGION = 'us-east-1'
         AWS_ACCOUNT_ID = '839133527922'
         ECR_REPO = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_NAME}"
-        IMAGE_TAG = "latest"
         GITHUB_REPO = 'https://github.com/jatinsharma114/pipeline1.git'
         AWS_CREDENTIALS_ID = "aws-creds-id"
         BRANCH = "develop"
+        USER_NAME = "Jatin Sharma"
+        USER_EMAIL = "jatin2010sharma@gmail.com"
+        DEPLOY_FILE = "manifests/develop/deployment.yaml"
     }
 
     stages {
@@ -19,17 +22,15 @@ pipeline {
             }
         }
 
-         stage('Maven Clean Install') {
+        stage('Maven Clean Install') {
             steps {
                 sh "mvn clean install"
             }
-         }
+        }
 
         stage('Build Docker Image') {
             steps {
-                script {
-                    sh "docker build -t ${ECR_NAME}:${IMAGE_TAG} ."
-                }
+                sh "docker build -t ${ECR_NAME}:${IMAGE_TAG} ."
             }
         }
 
@@ -46,16 +47,32 @@ pipeline {
 
         stage('Tag to ECR') {
             steps {
-                script {
-                    sh "docker tag ${ECR_NAME}:${IMAGE_TAG} ${ECR_REPO}:${IMAGE_TAG}"
-                }
+                sh "docker tag ${ECR_NAME}:${IMAGE_TAG} ${ECR_REPO}:${IMAGE_TAG}"
             }
         }
 
         stage('Push to ECR') {
             steps {
-                script {
-                    sh "docker push ${ECR_REPO}:${IMAGE_TAG}"
+                sh "docker push ${ECR_REPO}:${IMAGE_TAG}"
+            }
+        }
+
+        stage('Update Deployment File and Push to GitHub') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'GitHub', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                    sh """
+                    echo "Updating image tag in ${DEPLOY_FILE}..."
+
+                    git config --global user.name "${USER_NAME}"
+                    git config --global user.email "${USER_EMAIL}"
+
+                    sed -i "s|image: .*|image: ${ECR_REPO}:${IMAGE_TAG}|" ${DEPLOY_FILE}
+
+                    echo "Committing changes..."
+                    git add ${DEPLOY_FILE}
+                    git commit -m "Update image to ${IMAGE_TAG} for ${BRANCH}"
+                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/jatinsharma114/pipeline1.git HEAD:${BRANCH}
+                    """
                 }
             }
         }
