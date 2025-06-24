@@ -5,7 +5,7 @@ metadata:
   namespace: dev
 spec:
   rules:
-    - host: koko12.com
+    - host: koko12.local
       http:
         paths:
           - path: /myapp
