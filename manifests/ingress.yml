@@ -16,7 +16,7 @@ spec:
               service:
                 name: spring-boot-app
                 port:
-                  number: 8083
+                  number: 80
 #          - path: "/blog(/|$)(.*)"
 #            pathType: ImplementationSpecific
 #            backend:
