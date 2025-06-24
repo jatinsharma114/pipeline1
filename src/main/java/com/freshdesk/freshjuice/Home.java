@@ -13,7 +13,7 @@ public class Home {
 
     @GetMapping("/payment")
     public String paymentCheckOut() {
-        return "Payment checkout Done!";
+        return "NEW --> Payment checkout Done!";
     }
 
     @GetMapping("/blog")
