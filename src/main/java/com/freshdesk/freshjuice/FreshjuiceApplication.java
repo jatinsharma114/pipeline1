@@ -9,5 +9,6 @@ public class FreshjuiceApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(FreshjuiceApplication.class, args);
 	}
+	// ok
 
 }
