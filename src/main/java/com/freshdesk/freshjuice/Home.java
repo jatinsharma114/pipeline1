@@ -18,7 +18,7 @@ public class Home {
 
     @GetMapping("/blog")
     public String blog() {
-        return "Blog viewer..!!!!!! New Article!";
+        return "Blog viewer..!! New Article!";
     }
 
 
