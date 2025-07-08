@@ -12,7 +12,7 @@ env:
   BRANCH: develop
   USER_NAME: Jatin Sharma
   USER_EMAIL: jatin2010sharma@gmail.com
-  DEPLOY_FILE: manifests/develop/deployment.yml
+  DEPLOY_FILE: manifests/develop/k8-config.yml
 
 jobs:
   build-and-deploy:
