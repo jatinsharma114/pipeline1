@@ -1,0 +1,37 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - develop
+
+env:
+  AWS_REGION: us-east-1
+  AWS_ACCOUNT_ID: 839133527922
+  ECR_NAME: pipeline
+  BRANCH: develop
+  USER_NAME: Jatin Sharma
+  USER_EMAIL: jatin2010sharma@gmail.com
+  DEPLOY_FILE: manifests/develop/deployment.yml
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write  # Required to push to GitHub
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BRANCH }}
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build with Maven
+        run: mvn clean install
